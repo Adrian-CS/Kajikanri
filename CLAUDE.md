@@ -136,7 +136,7 @@ como mucho un aviso de cada tipo al día. Si el envío falla, ese día no se rei
 Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-07.
 
 **Hecho**
-- `schema.sql` v1. Probado en SQLite local; en D1 remoto ver "Cloudflare" abajo.
+- `schema.sql` v1, ejecutado en D1 remoto.
 - Worker: API completa, cron, Web Push. Compila con `tsc --strict` y workers-types.
 - `src/shared/time.ts` probado (estados, márgenes, basura por semana del mes).
 - `sw.ts`, `push.ts` del cliente, `vite.config.ts`, `wrangler.toml`, `scripts/vapid.mjs`.
@@ -149,12 +149,12 @@ Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 202
 - Claves VAPID generadas: pública en `wrangler.toml`, privada como secreto.
   **No volver a ejecutar `scripts/vapid.mjs`** (invalidaría las suscripciones).
 - `VAPID_SUBJECT` = `mailto:adrianflei@zohomail.eu`.
-- Por confirmar con `npx wrangler secret list`: que `VAPID_PRIVATE_JWK`, `SESSION_SECRET` e
-  `INVITE_CODE` estén en el Worker `kajikanri`. Hubo un intento contra un Worker "limpieza"
-  que no debería haberse creado; si existe en el panel, borrarlo.
-- Por confirmar: si ya se ejecutó `schema.sql` en remoto (usa `CREATE TABLE` sin
-  `IF NOT EXISTS`: una segunda ejecución falla).
-- Aún no se ha desplegado nada.
+- Secretos `VAPID_PRIVATE_JWK`, `SESSION_SECRET` e `INVITE_CODE` puestos en el Worker
+  `kajikanri` (verificado con `wrangler secret list`).
+- `schema.sql` **ya ejecutado en remoto** (versión con `users.email` y `credentials` como
+  Nefuda, verificado). No volver a ejecutarlo: usa `CREATE TABLE` sin `IF NOT EXISTS`.
+  Cambios futuros de esquema → ficheros de migración aparte (`ALTER TABLE`).
+- Aún no se ha desplegado código (el Worker existe solo con los secretos).
 
 **Pendiente** (en orden)
 - `package.json`, `tsconfig`, `index.html`. Versiones como en Nefuda: TypeScript ^5.7,
