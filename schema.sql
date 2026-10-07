@@ -4,6 +4,7 @@
 
 CREATE TABLE users (
   id            TEXT PRIMARY KEY,                 -- UUID generado por el Worker
+  email         TEXT NOT NULL UNIQUE,             -- identificador de login (auth.ts), no se muestra
   name          TEXT NOT NULL,
   lang          TEXT NOT NULL DEFAULT 'es',       -- 'es' | 'ja' (se valida en código)
   notify_minute INTEGER NOT NULL DEFAULT 480,     -- hora del resumen, minutos desde 00:00 JST
@@ -12,15 +13,18 @@ CREATE TABLE users (
   created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );
 
--- Passkeys. Si el auth.ts de Nefuda usa otros nombres de columna, manda el de Nefuda.
+-- Passkeys. Mismas columnas que en Nefuda (auth.ts copiado de allí).
 CREATE TABLE credentials (
-  id          TEXT PRIMARY KEY,                   -- credential ID en base64url
-  user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  public_key  BLOB NOT NULL,
-  counter     INTEGER NOT NULL DEFAULT 0,
-  transports  TEXT,
-  created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+  id            TEXT PRIMARY KEY,                 -- credential ID en base64url
+  user_id       TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  public_key    TEXT NOT NULL,                    -- base64url (TEXT, no BLOB: ver auth.ts)
+  counter       INTEGER NOT NULL DEFAULT 0,
+  transports    TEXT,                             -- JSON: ["internal","hybrid"]
+  device_name   TEXT,                             -- para poder revocar un dispositivo
+  created_at    TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  last_used_at  TEXT
 );
+CREATE INDEX credentials_user ON credentials(user_id);
 
 -- Zonas: texto libre del usuario, no se traduce (igual que los nombres de tareas).
 CREATE TABLE zones (

@@ -15,7 +15,9 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     // Solo /api/* llega aquí (run_worker_first); el resto lo sirven los assets.
-    if (url.pathname.startsWith('/api/auth/')) return handleAuth(req, env);
+    if (url.pathname.startsWith('/api/auth/')) {
+      return (await handleAuth(req, env)) ?? Response.json({ error: 'not found' }, { status: 404 });
+    }
 
     const user = await requireUser(req, env);
     if (!user) return Response.json({ error: 'unauthorized' }, { status: 401 });

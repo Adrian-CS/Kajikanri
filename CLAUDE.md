@@ -41,9 +41,11 @@ PWA (Vite + React + wouter)  --passkey-->  Worker  -->  D1
 
 - `src/worker/index.ts` — entrada: `/api/auth/*` → auth, resto de `/api/*` → `api.ts`.
   Los estáticos los sirve `[assets]` directamente (`run_worker_first` solo para `/api/*`).
-- `src/worker/auth.ts` — **copiar de Nefuda** (passkeys, cookie de sesión, `INVITE_CODE`).
-  Interfaz esperada: `handleAuth(req, env): Promise<Response>` y
-  `requireUser(req, env): Promise<{ id: string } | null>`.
+- `src/worker/auth.ts` — copiado de Nefuda (passkeys, JWT con `jose` en cookie, `INVITE_CODE`).
+  `handleAuth(req, env): Promise<Response | null>` y
+  `requireUser(req, env): Promise<{ id: string } | null>`. El login se identifica por
+  `users.email` (no se muestra); `users.name` es el nombre visible y se pide al registrarse
+  (`name` opcional en `/api/auth/register/options`, si falta se usa lo de antes de la @).
 - `src/worker/api.ts` — router a mano con regex, validación en cada handler.
 - `src/worker/cron.ts` — decide y envía los avisos.
 - `src/worker/push.ts` — Web Push implementado con WebCrypto (VAPID + aes128gcm).
@@ -136,9 +138,9 @@ como mucho un aviso de cada tipo al día. Si el envío falla, ese día no se rei
 - Worker: API completa, cron, Web Push. Compila con `tsc --strict` y workers-types.
 - `src/shared/time.ts` probado (estados, márgenes, basura por semana del mes).
 - `sw.ts`, `push.ts` del cliente, `vite.config.ts`, `wrangler.toml`, `scripts/vapid.mjs`.
+- `auth.ts` de Nefuda adaptado; `credentials` con las mismas columnas que Nefuda.
 
 **Pendiente**
-- Copiar `auth.ts` de Nefuda y comprobar que la tabla `credentials` coincide con la suya.
 - Frontend React: pantallas Hoy, Nueva/editar tarea, Ajustes, según el diseño de referencia.
   La pantalla Hoy tiene que usar `taskStatus()` en cliente para el "deshacer" optimista.
 - Diccionario i18n ES/JA de la interfaz.
@@ -175,7 +177,7 @@ Todas bajo `/api`, requieren sesión salvo `/api/auth/*`.
 
 ```bash
 npm create vite@latest . -- --template react-ts   # si el repo está vacío
-npm i wouter @simplewebauthn/server @simplewebauthn/browser
+npm i wouter jose @simplewebauthn/server@^13 @simplewebauthn/browser@^13
 npm i -D wrangler @cloudflare/workers-types vite-plugin-pwa workbox-precaching workbox-routing
 
 npx wrangler d1 create limpieza                    # pegar el id en wrangler.toml
