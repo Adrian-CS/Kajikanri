@@ -126,21 +126,39 @@ como mucho un aviso de cada tipo al día. Si el envío falla, ese día no se rei
 - **D1 no soporta `BEGIN`/`COMMIT`.** Usar `db.batch()` (es atómico).
 - **CPU del plan free (10 ms por invocación).** El cifrado de push es nativo y barato, pero no
   añadir trabajo pesado al cron. Con dos usuarios va sobrado.
-- **El atajo de desarrollo del auth** (usuario fijo sin cookie) viene de Nefuda: **nunca
-  desplegarlo en producción**.
+- **Si se añade un atajo de desarrollo al auth** (usuario fijo sin cookie): **nunca
+  desplegarlo en producción**. El `auth.ts` copiado de Nefuda no lo tiene.
 
 ---
 
 ## Estado
 
+Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-07.
+
 **Hecho**
-- `schema.sql` v1 (no ejecutado todavía).
+- `schema.sql` v1. Probado en SQLite local; en D1 remoto ver "Cloudflare" abajo.
 - Worker: API completa, cron, Web Push. Compila con `tsc --strict` y workers-types.
 - `src/shared/time.ts` probado (estados, márgenes, basura por semana del mes).
 - `sw.ts`, `push.ts` del cliente, `vite.config.ts`, `wrangler.toml`, `scripts/vapid.mjs`.
 - `auth.ts` de Nefuda adaptado; `credentials` con las mismas columnas que Nefuda.
+  Nefuda no tiene atajo de desarrollo en el auth: no hay nada que quitar antes de desplegar.
+- Nombre de la app: **Kajikanri** (antes "Limpieza"). Worker y D1 se llaman `kajikanri`.
 
-**Pendiente**
+**Cloudflare (estado al cerrar el 2026-10-07)**
+- D1 `kajikanri` creada (APAC), `database_id` ya en `wrangler.toml`.
+- Claves VAPID generadas: pública en `wrangler.toml`, privada como secreto.
+  **No volver a ejecutar `scripts/vapid.mjs`** (invalidaría las suscripciones).
+- `VAPID_SUBJECT` = `mailto:adrianflei@zohomail.eu`.
+- Por confirmar con `npx wrangler secret list`: que `VAPID_PRIVATE_JWK`, `SESSION_SECRET` e
+  `INVITE_CODE` estén en el Worker `kajikanri`. Hubo un intento contra un Worker "limpieza"
+  que no debería haberse creado; si existe en el panel, borrarlo.
+- Por confirmar: si ya se ejecutó `schema.sql` en remoto (usa `CREATE TABLE` sin
+  `IF NOT EXISTS`: una segunda ejecución falla).
+- Aún no se ha desplegado nada.
+
+**Pendiente** (en orden)
+- `package.json`, `tsconfig`, `index.html`. Versiones como en Nefuda: TypeScript ^5.7,
+  `@simplewebauthn/*` ^13, `jose` ^6 (con `@simplewebauthn` 14 no está probado).
 - Frontend React: pantallas Hoy, Nueva/editar tarea, Ajustes, según el diseño de referencia.
   La pantalla Hoy tiene que usar `taskStatus()` en cliente para el "deshacer" optimista.
 - Diccionario i18n ES/JA de la interfaz.

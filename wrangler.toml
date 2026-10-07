@@ -11,15 +11,15 @@ run_worker_first = ["/api/*"]
 [[d1_databases]]
 binding = "DB"
 database_name = "kajikanri"
-database_id = "PEGAR_AQUI"
+database_id = "3cbda999-8cec-4bf0-b2a9-163e641eb75b"
 
 # Cada 30 min. Los avisos se deduplican por día en notification_log.
 [triggers]
 crons = ["*/30 * * * *"]
 
 [vars]
-VAPID_PUBLIC_KEY = "PEGAR_AQUI"          # node scripts/vapid.mjs
-VAPID_SUBJECT = "mailto:PEGAR_TU_CORREO"  # Apple rechaza el push sin un sub válido
+VAPID_PUBLIC_KEY = "BOheJBiD4wmjH2QoPCmvieYZfBzymFxy0mUf5FUUM7IpkI1LsRi5oXkXDFL8FSx49yfM3XJkSybq29hKHzZBIKY"         # node scripts/vapid.mjs
+VAPID_SUBJECT = "mailto:adrianflei@zohomail.eu"  # Apple rechaza el push sin un sub válido
 
 # Secretos (npx wrangler secret put ...):
 #   SESSION_SECRET, INVITE_CODE, VAPID_PRIVATE_JWK
