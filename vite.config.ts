@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: 'prompt',
       injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'] },
       manifest: {
-        name: 'Limpieza',
-        short_name: 'Limpieza',
+        name: 'Kajikanri',
+        short_name: 'Kajikanri',
         lang: 'es',
         start_url: '/',
         display: 'standalone',

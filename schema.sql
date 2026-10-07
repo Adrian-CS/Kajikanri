@@ -1,4 +1,4 @@
--- Limpieza · esquema D1 (v1)
+-- Kajikanri · esquema D1 (v1)
 -- Una casa por despliegue: todos los usuarios ven las mismas tareas.
 -- Fechas en ISO UTC ('2026-10-07T08:00:00.000Z'); los días se calculan en JST en código.
 

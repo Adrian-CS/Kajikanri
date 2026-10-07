@@ -14,7 +14,7 @@ self.addEventListener('push', (event) => {
   const data = event.data?.json() ?? {};
   // iOS exige mostrar una notificación por cada push; si no, Safari acaba revocando el permiso.
   event.waitUntil(
-    self.registration.showNotification(data.title ?? 'Limpieza', {
+    self.registration.showNotification(data.title ?? 'Kajikanri', {
       body: data.body,
       tag: data.tag,
       data: { url: data.url ?? '/' },

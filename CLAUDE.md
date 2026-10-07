@@ -1,4 +1,4 @@
-# CLAUDE.md — Limpieza
+# CLAUDE.md — Kajikanri
 
 PWA para llevar el control de la limpieza de casa y recibir un aviso cuando toca algo.
 Proyecto personal. Lo usa Adrián; puede que su pareja también. Restricción dura:
@@ -180,8 +180,8 @@ npm create vite@latest . -- --template react-ts   # si el repo está vacío
 npm i wouter jose @simplewebauthn/server@^13 @simplewebauthn/browser@^13
 npm i -D wrangler @cloudflare/workers-types vite-plugin-pwa workbox-precaching workbox-routing
 
-npx wrangler d1 create limpieza                    # pegar el id en wrangler.toml
-npx wrangler d1 execute limpieza --remote --file=./schema.sql
+npx wrangler d1 create kajikanri                   # pegar el id en wrangler.toml
+npx wrangler d1 execute kajikanri --remote --file=./schema.sql
 node scripts/vapid.mjs                             # clave pública → wrangler.toml
 npx wrangler secret put VAPID_PRIVATE_JWK
 npx wrangler secret put SESSION_SECRET

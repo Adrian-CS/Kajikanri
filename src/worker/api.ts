@@ -285,7 +285,7 @@ const unsubscribe: Handler = async ({ req, env, user }) => {
 };
 
 const testPush: Handler = async ({ env, user }) => {
-  await pushToUser(env, user.id, { title: 'Limpieza', body: 'Prueba de notificación ✓', tag: 'test', url: '/' });
+  await pushToUser(env, user.id, { title: 'Kajikanri', body: 'Prueba de notificación ✓', tag: 'test', url: '/' });
   return json({ ok: true });
 };
 

@@ -1,4 +1,4 @@
-name = "limpieza"
+name = "kajikanri"
 main = "src/worker/index.ts"
 compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat"]
@@ -10,7 +10,7 @@ run_worker_first = ["/api/*"]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "limpieza"
+database_name = "kajikanri"
 database_id = "PEGAR_AQUI"
 
 # Cada 30 min. Los avisos se deduplican por día en notification_log.
