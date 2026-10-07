@@ -1,0 +1,25 @@
+name = "limpieza"
+main = "src/worker/index.ts"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "limpieza"
+database_id = "PEGAR_AQUI"
+
+# Cada 30 min. Los avisos se deduplican por día en notification_log.
+[triggers]
+crons = ["*/30 * * * *"]
+
+[vars]
+VAPID_PUBLIC_KEY = "PEGAR_AQUI"          # node scripts/vapid.mjs
+VAPID_SUBJECT = "mailto:PEGAR_TU_CORREO"  # Apple rechaza el push sin un sub válido
+
+# Secretos (npx wrangler secret put ...):
+#   SESSION_SECRET, INVITE_CODE, VAPID_PRIVATE_JWK
