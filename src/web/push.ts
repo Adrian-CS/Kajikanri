@@ -8,7 +8,7 @@ const isStandalone = () =>
 
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-function keyToBytes(b64url: string): Uint8Array {
+function keyToBytes(b64url: string): Uint8Array<ArrayBuffer> {
   const p = b64url.replace(/-/g, '+').replace(/_/g, '/');
   const bin = atob(p + '='.repeat((4 - (p.length % 4)) % 4));
   return Uint8Array.from(bin, (c) => c.charCodeAt(0));

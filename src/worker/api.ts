@@ -285,7 +285,9 @@ const unsubscribe: Handler = async ({ req, env, user }) => {
 };
 
 const testPush: Handler = async ({ env, user }) => {
-  await pushToUser(env, user.id, { title: 'Kajikanri', body: 'Prueba de notificación ✓', tag: 'test', url: '/' });
+  const me = await env.DB.prepare('SELECT lang FROM users WHERE id = ?').bind(user.id).first<{ lang: string }>();
+  const body = me?.lang === 'ja' ? 'テスト通知 ✓' : 'Prueba de notificación ✓';
+  await pushToUser(env, user.id, { title: 'Kajikanri', body, tag: 'test', url: '/' });
   return json({ ok: true });
 };
 

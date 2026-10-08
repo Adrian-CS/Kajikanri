@@ -133,7 +133,7 @@ como mucho un aviso de cada tipo al día. Si el envío falla, ese día no se rei
 
 ## Estado
 
-Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-07.
+Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-08.
 
 **Hecho**
 - `schema.sql` v1, ejecutado en D1 remoto.
@@ -154,17 +154,27 @@ Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 202
 - `schema.sql` **ya ejecutado en remoto** (versión con `users.email` y `credentials` como
   Nefuda, verificado). No volver a ejecutarlo: usa `CREATE TABLE` sin `IF NOT EXISTS`.
   Cambios futuros de esquema → ficheros de migración aparte (`ALTER TABLE`).
-- Aún no se ha desplegado código (el Worker existe solo con los secretos).
+- Despliegue automático: `.github/workflows/deploy.yml` hace typecheck + build +
+  `wrangler deploy` en cada push a `main`. Usa los secretos del repo `CLOUDFLARE_API_TOKEN`
+  y `CLOUDFLARE_ACCOUNT_ID`. No ejecuta `schema.sql` ni toca los secretos del Worker.
 
-**Pendiente** (en orden)
-- `package.json`, `tsconfig`, `index.html`. Versiones como en Nefuda: TypeScript ^5.7,
-  `@simplewebauthn/*` ^13, `jose` ^6 (con `@simplewebauthn` 14 no está probado).
-- Frontend React: pantallas Hoy, Nueva/editar tarea, Ajustes, según el diseño de referencia.
-  La pantalla Hoy tiene que usar `taskStatus()` en cliente para el "deshacer" optimista.
-- Diccionario i18n ES/JA de la interfaz.
-- Pantalla de instalación para iOS (cuando `pushStatus()` sea `needs-install`).
-- Editor de reglas de basura (días reales de Nerima por rellenar).
-- Iconos: `icon-192.png`, `icon-512.png`, `icon-512-maskable.png`, `badge-72.png` en `public/`.
+**Frontend (2026-10-08)**
+- `package.json`, `tsconfig.{base,worker,web,sw}.json` (tres programas: Worker con
+  workers-types, PWA con DOM, SW con WebWorker). `npm run typecheck` los pasa todos.
+- `index.html`, `src/web/main.tsx`, `App.tsx` (wouter), `store.tsx` (estado de `/api/state`),
+  `api.ts` (cliente), `ui.tsx` (iconos, Toggle, Segmented, barra inferior), `styles.css`
+  (tokens del diseño de referencia).
+- Pantallas en `src/web/screens/`: Hoy (`/`, completar optimista con `taskStatus()` y
+  deshacer), Tareas (`/tasks`), Nueva/editar (`/tasks/new`, `/tasks/:id`, con historial y
+  archivar), Basura (`/trash`, editor de reglas), Ajustes (`/settings`, avisos, modo viaje,
+  push del dispositivo, ayuda de instalación iOS si `needs-install`, idioma), Login (passkeys).
+- `src/web/i18n.ts`: diccionario ES/JA tipado (JA tiene que tener las mismas claves que ES).
+  Los errores del Worker de auth vienen en español: la PWA los traduce por código HTTP.
+- Iconos generados en `public/` (check blanco sobre #1F5A52) + `apple-touch-icon.png`.
+
+**Pendiente**
+- Rellenar las reglas de basura reales de Nerima desde la pantalla Basura.
+- Prueba real de push en iPhone (PWA instalada) y Android.
 
 ---
 
