@@ -1,12 +1,13 @@
 import { Link } from 'wouter';
+import { zoneLabel } from '../i18n';
 import { useLoaded } from '../store';
 import { Icon } from '../ui';
 import { taskMeta } from './Today';
 
 /** Todas las tareas agrupadas por zona, para editarlas. */
 export function Tasks() {
-  const { state, t } = useLoaded();
-  const zones = [...state.zones.map((z) => ({ id: z.id as number | null, name: z.name })), { id: null, name: t.noZone }];
+  const { state, t, lang } = useLoaded();
+  const zones = [...state.zones.map((z) => ({ id: z.id as number | null, name: zoneLabel(z.name, lang) })), { id: null, name: t.noZone }];
   const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
 
   return (

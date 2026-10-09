@@ -22,7 +22,9 @@ vez toca el jueves siguiente.
 
 1. **Gratis.** Workers + D1 + Cron Triggers del plan free. Sin servicios de push de terceros.
 2. **Bilingüe ES / JA.** Texto nuevo de la interfaz va a los dos idiomas o no va.
-   Los nombres de tareas y zonas son texto del usuario y **no se traducen**.
+   Los nombres de tareas y zonas son texto del usuario y **no se traducen**. Excepción: las
+   cinco zonas que crea `schema.sql` (Baño, Cocina…) se muestran traducidas con `zoneLabel()`
+   en `i18n.ts`, buscando por el nombre en español guardado en D1.
 3. **Silenciosa.** Un resumen diario como máximo, más dos avisos opcionales (muy atrasado y
    basura). Si no hay nada pendiente, no se envía nada.
 4. **Una casa por despliegue.** Todos los usuarios ven las mismas tareas. No hay `home_id`.

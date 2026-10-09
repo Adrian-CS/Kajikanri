@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { taskStatus, type Status } from '../../shared/time';
 import { api, type AppState, type Task } from '../api';
-import { headerDate, type T } from '../i18n';
+import { headerDate, zoneLabel, type T } from '../i18n';
 import { useLoaded } from '../store';
 import { Icon } from '../ui';
 
@@ -43,7 +43,10 @@ export function Today() {
   };
   useEffect(() => () => clearTimeout(timer.current), []);
 
-  const zoneName = (id: number | null) => state.zones.find((z) => z.id === id)?.name ?? '';
+  const zoneName = (id: number | null) => {
+    const z = state.zones.find((x) => x.id === id);
+    return z ? zoneLabel(z.name, lang) : '';
+  };
 
   const counts = useMemo(() => {
     const c = { late: 0, due: 0, ok: 0 };

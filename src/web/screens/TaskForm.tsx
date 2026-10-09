@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { api, type TaskInput } from '../api';
+import { zoneLabel } from '../i18n';
 import { useLoaded } from '../store';
 import { Icon, Segmented, Toggle, TopBar } from '../ui';
 
@@ -118,7 +119,7 @@ export function TaskForm({ id }: { id?: number }) {
           <div className="chips">
             {state.zones.map((z) => (
               <button key={z.id} type="button" className={`chip${zone === z.id ? ' sel' : ''}`} aria-pressed={zone === z.id} onClick={() => setZone(zone === z.id ? null : z.id)}>
-                {z.name}
+                {zoneLabel(z.name, lang)}
               </button>
             ))}
             <button type="button" className="chip" aria-label={t.addZone} onClick={addZone}>

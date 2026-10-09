@@ -324,3 +324,17 @@ export function headerDate(lang: Lang, now: Date): string {
   if (lang === 'ja') return `${m + 1}月${d}日（${wd}）`;
   return `${wd[0].toUpperCase()}${wd.slice(1)}, ${d} ${MONTHS_ES[m]}`;
 }
+
+/**
+ * Las cinco zonas que crea schema.sql se guardan en español, pero son nuestras, no del
+ * usuario: se muestran traducidas. Las zonas que crea el usuario se muestran tal cual.
+ */
+const DEFAULT_ZONES: Record<string, Record<Lang, string>> = {
+  Baño: { es: 'Baño', ja: 'お風呂' },
+  Cocina: { es: 'Cocina', ja: 'キッチン' },
+  Salón: { es: 'Salón', ja: 'リビング' },
+  Dormitorio: { es: 'Dormitorio', ja: '寝室' },
+  Entrada: { es: 'Entrada', ja: '玄関' },
+};
+
+export const zoneLabel = (name: string, lang: Lang) => DEFAULT_ZONES[name]?.[lang] ?? name;
