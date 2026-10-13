@@ -5,6 +5,7 @@ import { TaskForm } from './screens/TaskForm';
 import { Tasks } from './screens/Tasks';
 import { Today } from './screens/Today';
 import { Trash } from './screens/Trash';
+import { Zones } from './screens/Zones';
 import { useStore } from './store';
 import { BottomNav } from './ui';
 
@@ -31,6 +32,7 @@ export function App({ update }: { update: (() => void) | null }) {
   else
     body = (
       <Switch>
+        <Route path="/zones" component={Zones} />
         <Route path="/tasks/new">
           <TaskForm />
         </Route>

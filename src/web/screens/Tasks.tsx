@@ -19,6 +19,10 @@ export function Tasks() {
         </Link>
       </div>
 
+      <Link href="/zones" className="text-btn" style={{ alignSelf: 'flex-start', textDecoration: 'none', display: 'inline-flex', alignItems: 'center' }}>
+        {t.editZones}
+      </Link>
+
       {state.tasks.length === 0 && (
         <div className="empty">
           <h2>{t.emptyTitle}</h2>

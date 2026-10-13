@@ -192,6 +192,26 @@ const createZone: Handler = async ({ req, env }) => {
   return json(row, 201);
 };
 
+const renameZone: Handler = async ({ req, env, params }) => {
+  const b = await body<any>(req);
+  if (!b || !isText(b.name, 40)) return bad('name');
+  const row = await env.DB.prepare('UPDATE zones SET name = ? WHERE id = ? RETURNING *')
+    .bind(b.name.trim(), Number(params[0]))
+    .first();
+  return row ? json(row) : json({ error: 'not_found' }, 404);
+};
+
+const deleteZone: Handler = async ({ env, params }) => {
+  const id = Number(params[0]);
+  // Las tareas de la zona se quedan sin zona (también las archivadas, por el historial).
+  // Se hace explícito en vez de fiarse de ON DELETE SET NULL.
+  await env.DB.batch([
+    env.DB.prepare('UPDATE tasks SET zone_id = NULL WHERE zone_id = ?').bind(id),
+    env.DB.prepare('DELETE FROM zones WHERE id = ?').bind(id),
+  ]);
+  return json({ ok: true });
+};
+
 // ---------- basura: se reemplaza la lista entera ----------
 const putTrash: Handler = async ({ req, env }) => {
   const b = await body<{ rules: TrashRule[] }>(req);
@@ -301,6 +321,8 @@ const routes: [string, RegExp, Handler][] = [
   ['GET', /^\/api\/tasks\/(\d+)\/history$/, history],
   ['POST', /^\/api\/completions\/(\d+)\/undo$/, undoCompletion],
   ['POST', /^\/api\/zones$/, createZone],
+  ['PATCH', /^\/api\/zones\/(\d+)$/, renameZone],
+  ['DELETE', /^\/api\/zones\/(\d+)$/, deleteZone],
   ['PUT', /^\/api\/trash$/, putTrash],
   ['POST', /^\/api\/pause$/, setPause],
   ['PATCH', /^\/api\/me$/, updateMe],

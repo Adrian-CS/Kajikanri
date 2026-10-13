@@ -2,6 +2,8 @@ name = "kajikanri"
 main = "src/worker/index.ts"
 compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat"]
+# Sin URL de preview por versión: solo existe la de producción.
+preview_urls = false
 
 [assets]
 directory = "./dist"

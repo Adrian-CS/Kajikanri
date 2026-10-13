@@ -135,12 +135,13 @@ como mucho un aviso de cada tipo al día. Si el envío falla, ese día no se rei
 
 ## Estado
 
-Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-08.
+Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-13.
 
 **Hecho**
 - `schema.sql` v1, ejecutado en D1 remoto.
 - Worker: API completa, cron, Web Push. Compila con `tsc --strict` y workers-types.
-- `src/shared/time.ts` probado (estados, márgenes, basura por semana del mes).
+- `src/shared/time.ts` con tests en `test/time.test.ts` (Vitest, `npm test`): días JST,
+  estados, margen flexible, basura por semana del mes. El workflow los pasa antes de desplegar.
 - `sw.ts`, `push.ts` del cliente, `vite.config.ts`, `wrangler.toml`, `scripts/vapid.mjs`.
 - `auth.ts` de Nefuda adaptado; `credentials` con las mismas columnas que Nefuda.
   Nefuda no tiene atajo de desarrollo en el auth: no hay nada que quitar antes de desplegar.
@@ -156,7 +157,7 @@ Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 202
 - `schema.sql` **ya ejecutado en remoto** (versión con `users.email` y `credentials` como
   Nefuda, verificado). No volver a ejecutarlo: usa `CREATE TABLE` sin `IF NOT EXISTS`.
   Cambios futuros de esquema → ficheros de migración aparte (`ALTER TABLE`).
-- Despliegue automático: `.github/workflows/deploy.yml` hace typecheck + build +
+- Despliegue automático: `.github/workflows/deploy.yml` hace typecheck + tests + build +
   `wrangler deploy` en cada push a `main`. Usa los secretos del repo `CLOUDFLARE_API_TOKEN`
   y `CLOUDFLARE_ACCOUNT_ID`. No ejecuta `schema.sql` ni toca los secretos del Worker.
 
@@ -173,8 +174,16 @@ Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 202
 - `src/web/i18n.ts`: diccionario ES/JA tipado (JA tiene que tener las mismas claves que ES).
   Los errores del Worker de auth vienen en español: la PWA los traduce por código HTTP.
 - Iconos generados en `public/` (check blanco sobre #1F5A52) + `apple-touch-icon.png`.
+- Zonas: pantalla `/zones` (desde Tareas) para renombrar, quitar y añadir. Al quitar una
+  zona sus tareas quedan sin zona. Renombrar una zona por defecto hace que deje de traducirse.
+- Modo oscuro según el sistema (`prefers-color-scheme`). Todos los colores son variables en
+  `styles.css`: `--brand` es el relleno (botones) y `--accent` el color de marca para texto e
+  iconos. No meter colores fijos en el CSS ni en `style={}`.
+- `preview_urls = false` en `wrangler.toml`: solo existe la URL de producción.
 
 **Pendiente**
+- Registro: con `INVITE_CODE` y el email de alguien se puede añadir una passkey a su cuenta
+  (viene de Nefuda). Aplazado a propósito; el arreglo es permitir solo emails nuevos.
 - Rellenar las reglas de basura reales de Nerima desde la pantalla Basura.
 - Prueba real de push en iPhone (PWA instalada) y Android.
 
@@ -194,6 +203,7 @@ Todas bajo `/api`, requieren sesión salvo `/api/auth/*`.
 | GET | `/tasks/:id/history` | Últimos 50 completados |
 | POST | `/completions/:id/undo` | Deshace (solo el último de la tarea) |
 | POST | `/zones` | Nueva zona |
+| PATCH / DELETE | `/zones/:id` | Renombra / quita una zona (sus tareas quedan sin zona) |
 | PUT | `/trash` | Reemplaza las reglas de basura |
 | POST | `/pause` | `{ on: boolean }` modo viaje |
 | PATCH | `/me` | Nombre, idioma, hora de aviso, toggles |

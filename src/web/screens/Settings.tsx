@@ -150,7 +150,7 @@ export function Settings() {
             <div className="hint" style={{ fontSize: 14, color: 'var(--ink-2)', marginTop: 4 }}>{t.installBody}</div>
             <ol>
               <li>
-                {t.installStep1} <span style={{ color: 'var(--brand)', verticalAlign: 'middle' }}>{Icon.share(16)}</span>
+                {t.installStep1} <span style={{ color: 'var(--accent)', verticalAlign: 'middle' }}>{Icon.share(16)}</span>
               </li>
               <li>{t.installStep2}</li>
               <li>{t.installStep3}</li>

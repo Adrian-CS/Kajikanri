@@ -56,6 +56,12 @@ const es = {
   // Tareas
   tasks: 'Tareas',
   noZone: 'Sin zona',
+  zones: 'Zonas',
+  editZones: 'Editar zonas',
+  zonesIntro: 'Los cambios de nombre se guardan al salir del campo.',
+  removeZone: 'Quitar zona',
+  zoneDeleteConfirm: (name: string) => `¿Quitar la zona «${name}»? Sus tareas se quedan sin zona.`,
+  zonesEmpty: 'No hay zonas.',
 
   // Formulario
   editTask: 'Editar tarea',
@@ -208,6 +214,12 @@ const ja: Dict = {
 
   tasks: 'タスク',
   noZone: '場所なし',
+  zones: '場所',
+  editZones: '場所を編集',
+  zonesIntro: '名前の変更は入力欄から離れると保存されます。',
+  removeZone: '場所を削除',
+  zoneDeleteConfirm: (name: string) => `「${name}」を削除しますか？この場所のタスクは「場所なし」になります。`,
+  zonesEmpty: '場所がありません。',
 
   editTask: 'タスクを編集',
   name: '名前',
