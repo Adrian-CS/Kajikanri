@@ -42,5 +42,6 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 self.addEventListener('message', (event) => {
-  if (event.data === 'SKIP_WAITING') self.skipWaiting();
+  // workbox-window (updateSW(true) en main.tsx) manda { type: 'SKIP_WAITING' }, no el texto suelto.
+  if (event.data?.type === 'SKIP_WAITING' || event.data === 'SKIP_WAITING') self.skipWaiting();
 });
