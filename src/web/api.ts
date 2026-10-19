@@ -37,6 +37,7 @@ export interface AppState {
   trashRules: (TrashRule & { id: number })[];
   trash: { today: string[]; tomorrow: string[] };
   pausedSince: string | null;
+  freqPresets: number[];
   tasks: Task[];
 }
 
@@ -84,6 +85,7 @@ export const api = {
   renameZone: (id: number, name: string) => call<{ id: number; name: string; sort: number }>('PATCH', `/zones/${id}`, { name }),
   deleteZone: (id: number) => call('DELETE', `/zones/${id}`),
   putTrash: (rules: TrashRule[]) => call('PUT', '/trash', { rules }),
+  putPresets: (days: number[]) => call<{ days: number[] }>('PUT', '/presets', { days }),
   pause: (on: boolean) => call<{ pausedSince: string | null }>('POST', '/pause', { on }),
   updateMe: (m: Partial<Omit<Me, 'id'>>) => call<Me>('PATCH', '/me', m),
   testPush: () => call('POST', '/push/test'),

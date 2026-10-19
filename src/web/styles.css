@@ -198,3 +198,6 @@ h1 { margin: 0; font-family: var(--display); font-size: 34px; font-weight: 700; 
 
 .update { position: fixed; top: calc(8px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(480px, calc(100% - 32px)); background: var(--toast-bg); color: var(--toast-fg); border-radius: 14px; padding: 8px 8px 8px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; z-index: 30; }
 .update button { min-height: 40px; background: transparent; border: none; color: var(--toast-action); font-weight: 700; }
+/* Sin flechitas en los campos numéricos: tapan el sufijo («Días», «min») y en móvil no se usan. */
+input[type='number'] { -moz-appearance: textfield; appearance: textfield; }
+input[type='number']::-webkit-inner-spin-button, input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }

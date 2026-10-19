@@ -6,6 +6,7 @@ import { useLoaded } from '../store';
 import { Icon, Segmented, Toggle, TopBar } from '../ui';
 
 const PRESETS = [3, 7, 14, 30] as const;
+const MAX_CUSTOM = 8; // igual que MAX_PRESETS en el Worker
 const LAST_DONE = [0, 3, 7, 14, 30] as const;
 /** Margen flexible: 30 % de la frecuencia, mínimo 1 día (CLAUDE.md). */
 const flexFor = (every: number) => Math.min(every, Math.max(1, Math.round(every * 0.3)));
@@ -26,6 +27,8 @@ export function TaskForm({ id }: { id?: number }) {
   const [lastDone, setLastDone] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [editFreq, setEditFreq] = useState(false);
+  const [newFreq, setNewFreq] = useState('');
   const [history, setHistory] = useState<{ id: number; done_at: string; user_name: string | null }[] | null>(null);
 
   useEffect(() => {
@@ -51,6 +54,30 @@ export function TaskForm({ id }: { id?: number }) {
     } catch {
       setError(t.errorGeneric);
     }
+  };
+
+  // Frecuencias rápidas propias: se guardan para toda la casa (PUT /api/presets).
+  const savePresets = async (days: number[]) => {
+    setState((s) => ({ ...s, freqPresets: days }));
+    try {
+      const r = await api.putPresets(days);
+      setState((s) => ({ ...s, freqPresets: r.days }));
+    } catch {
+      setError(t.errorGeneric);
+      refresh();
+    }
+  };
+
+  const addFreq = (e: React.FormEvent) => {
+    e.preventDefault();
+    const n = parseInt(newFreq, 10);
+    if (!(n >= 1 && n <= 365)) return;
+    setEvery(n);
+    setNewFreq('');
+    if (!(PRESETS as readonly number[]).includes(n) && !state.freqPresets.includes(n) && state.freqPresets.length < MAX_CUSTOM) {
+      savePresets([...state.freqPresets, n].sort((a, b) => a - b));
+    }
+    setEditFreq(false);
   };
 
   const save = async () => {
@@ -150,6 +177,39 @@ export function TaskForm({ id }: { id?: number }) {
               </button>
             ))}
           </div>
+          <div className="chips">
+            {state.freqPresets.map((p) =>
+              editFreq ? (
+                <button key={p} type="button" className="chip" aria-label={t.removeFreq(p)} onClick={() => savePresets(state.freqPresets.filter((x) => x !== p))}>
+                  {t.presetDays(p)}
+                  {Icon.x(14)}
+                </button>
+              ) : (
+                <button key={p} type="button" className={`chip${every === p ? ' sel' : ''}`} aria-pressed={every === p} onClick={() => setEvery(p)}>
+                  {t.presetDays(p)}
+                </button>
+              ),
+            )}
+            {!editFreq && (
+              <button type="button" className="chip" onClick={() => setEditFreq(true)}>
+                {Icon.plus(16)}
+                {t.addFreq}
+              </button>
+            )}
+          </div>
+          {editFreq && (
+            <form className="row" onSubmit={addFreq}>
+              <div className="input-suffix" style={{ flex: 1 }}>
+                <input className="input" type="number" inputMode="numeric" min={1} max={365} aria-label={t.freqDays} placeholder="17" value={newFreq} onChange={(e) => setNewFreq(e.target.value)} autoFocus />
+                <span>{t.freqDays}</span>
+              </div>
+              {newFreq ? (
+                <button type="submit" className="chip sel">{t.freqAdd}</button>
+              ) : (
+                <button type="button" className="chip" onClick={() => setEditFreq(false)}>{t.freqDone}</button>
+              )}
+            </form>
+          )}
         </div>
 
         <div className="card">

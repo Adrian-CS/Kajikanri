@@ -33,7 +33,7 @@ async function body<T = Record<string, unknown>>(req: Request): Promise<T | null
 // ---------- estado completo para la PWA ----------
 const getState: Handler = async ({ env, user }) => {
   const db = env.DB;
-  const [tasks, zones, users, trash, paused, me] = await db.batch([
+  const [tasks, zones, users, trash, paused, me, presets] = await db.batch([
     db.prepare('SELECT * FROM tasks WHERE archived = 0'),
     db.prepare('SELECT id, name, sort FROM zones ORDER BY sort, id'),
     db.prepare('SELECT id, name FROM users ORDER BY created_at'),
@@ -42,6 +42,7 @@ const getState: Handler = async ({ env, user }) => {
     db.prepare('SELECT id, name, lang, notify_minute, notify_late, notify_trash FROM users WHERE id = ?').bind(
       user.id,
     ),
+    db.prepare("SELECT value FROM settings WHERE key = 'freq_presets'"),
   ]);
   const now = new Date();
   const rules = trash.results as unknown as TrashRule[];
@@ -53,6 +54,7 @@ const getState: Handler = async ({ env, user }) => {
     trashRules: rules,
     trash: { today: trashOn(rules, now, 0), tomorrow: trashOn(rules, now, 1) },
     pausedSince: (paused.results[0] as { value: string } | undefined)?.value ?? null,
+    freqPresets: parsePresets((presets.results[0] as { value: string } | undefined)?.value),
     tasks: (tasks.results as any[]).map((t) => ({ ...t, ...taskStatus(t, now) })),
   });
 };
@@ -236,6 +238,33 @@ const putTrash: Handler = async ({ req, env }) => {
   return json({ ok: true });
 };
 
+// ---------- frecuencias rápidas propias (compartidas por la casa) ----------
+const MAX_PRESETS = 8;
+
+function parsePresets(raw: string | undefined): number[] {
+  try {
+    const v = JSON.parse(raw ?? '[]');
+    return Array.isArray(v) ? v.filter((n) => isInt(n, 1, 365)) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Reemplaza la lista entera, como la basura. Las cuatro fijas (3, 7, 14, 30) no se guardan. */
+const putPresets: Handler = async ({ req, env }) => {
+  const b = await body<{ days: unknown }>(req);
+  if (!b || !Array.isArray(b.days) || b.days.length > MAX_PRESETS || !b.days.every((n) => isInt(n, 1, 365))) {
+    return bad('days');
+  }
+  const days = [...new Set(b.days as number[])].sort((x, y) => x - y);
+  await env.DB.prepare(
+    "INSERT INTO settings (key, value) VALUES ('freq_presets', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+  )
+    .bind(JSON.stringify(days))
+    .run();
+  return json({ days });
+};
+
 // ---------- modo viaje ----------
 const setPause: Handler = async ({ req, env }) => {
   const b = await body<{ on: boolean }>(req);
@@ -325,6 +354,7 @@ const routes: [string, RegExp, Handler][] = [
   ['DELETE', /^\/api\/zones\/(\d+)$/, deleteZone],
   ['PUT', /^\/api\/trash$/, putTrash],
   ['POST', /^\/api\/pause$/, setPause],
+  ['PUT', /^\/api\/presets$/, putPresets],
   ['PATCH', /^\/api\/me$/, updateMe],
   ['GET', /^\/api\/push\/key$/, pushKey],
   ['POST', /^\/api\/push\/subscribe$/, subscribe],

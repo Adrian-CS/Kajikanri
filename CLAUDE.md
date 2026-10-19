@@ -135,7 +135,7 @@ como mucho un aviso de cada tipo al día. Si el envío falla, ese día no se rei
 
 ## Estado
 
-Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-13.
+Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-19.
 
 **Hecho**
 - `schema.sql` v1, ejecutado en D1 remoto.
@@ -180,6 +180,9 @@ Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 202
   `styles.css`: `--brand` es el relleno (botones) y `--accent` el color de marca para texto e
   iconos. No meter colores fijos en el CSS ni en `style={}`.
 - `preview_urls = false` en `wrangler.toml`: solo existe la URL de producción.
+- Frecuencias rápidas: las cuatro fijas (3 d, 1 sem, 2 sem, 1 mes) más las que añada el
+  usuario con «Otra frecuencia». Las propias se guardan para toda la casa en
+  `settings.freq_presets` (JSON, máx. 8) vía `PUT /api/presets` y llegan en `/state`.
 
 **Pendiente**
 - Registro: con `INVITE_CODE` y el email de alguien se puede añadir una passkey a su cuenta
@@ -205,6 +208,7 @@ Todas bajo `/api`, requieren sesión salvo `/api/auth/*`.
 | POST | `/zones` | Nueva zona |
 | PATCH / DELETE | `/zones/:id` | Renombra / quita una zona (sus tareas quedan sin zona) |
 | PUT | `/trash` | Reemplaza las reglas de basura |
+| PUT | `/presets` | `{ days: number[] }` reemplaza las frecuencias rápidas propias |
 | POST | `/pause` | `{ on: boolean }` modo viaje |
 | PATCH | `/me` | Nombre, idioma, hora de aviso, toggles |
 | GET | `/push/key` | Clave pública VAPID |
