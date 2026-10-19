@@ -183,6 +183,8 @@ Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 202
 - Frecuencias rápidas: las cuatro fijas (3 d, 1 sem, 2 sem, 1 mes) más las que añada el
   usuario con «Otra frecuencia». Las propias se guardan para toda la casa en
   `settings.freq_presets` (JSON, máx. 8) vía `PUT /api/presets` y llegan en `/state`.
+- «¿Cuándo se hizo por última vez?» (solo al crear): chips fijos más «Otro» para escribir
+  los días. Ese valor no se guarda como opción; solo vale para la tarea que se crea.
 
 **Pendiente**
 - Registro: con `INVITE_CODE` y el email de alguien se puede añadir una passkey a su cuenta

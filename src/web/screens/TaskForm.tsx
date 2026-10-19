@@ -25,6 +25,8 @@ export function TaskForm({ id }: { id?: number }) {
   const [owner, setOwner] = useState<Owner>(existing ? (existing.rotate ? 'rotate' : (existing.assignee_id ?? 'any')) : 'any');
   const [mins, setMins] = useState(existing?.est_minutes ? String(existing.est_minutes) : '');
   const [lastDone, setLastDone] = useState(0);
+  const [editLast, setEditLast] = useState(false);
+  const [newLast, setNewLast] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [editFreq, setEditFreq] = useState(false);
@@ -243,7 +245,41 @@ export function TaskForm({ id }: { id?: number }) {
                   {d === 0 ? t.lastDoneToday : t.lastDoneAgo(d)}
                 </button>
               ))}
+              {/* Un valor escrito a mano se ve como un chip más; no se guarda, solo vale para esta tarea. */}
+              {!(LAST_DONE as readonly number[]).includes(lastDone) && (
+                <button type="button" className="chip sel" aria-pressed="true">
+                  {t.lastDoneAgo(lastDone)}
+                </button>
+              )}
+              {!editLast && (
+                <button type="button" className="chip" onClick={() => setEditLast(true)}>
+                  {Icon.plus(16)}
+                  {t.lastDoneOther}
+                </button>
+              )}
             </div>
+            {editLast && (
+              <form
+                className="row"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const n = parseInt(newLast, 10);
+                  if (n >= 0 && n <= 365) setLastDone(n);
+                  setNewLast('');
+                  setEditLast(false);
+                }}
+              >
+                <div className="input-suffix" style={{ flex: 1 }}>
+                  <input className="input" type="number" inputMode="numeric" min={0} max={365} aria-label={t.daysAgoLabel} placeholder="10" value={newLast} onChange={(e) => setNewLast(e.target.value)} autoFocus />
+                  <span>{t.daysAgoLabel}</span>
+                </div>
+                {newLast ? (
+                  <button type="submit" className="chip sel">{t.lastDoneUse}</button>
+                ) : (
+                  <button type="button" className="chip" onClick={() => setEditLast(false)}>{t.cancel}</button>
+                )}
+              </form>
+            )}
           </div>
         )}
 
