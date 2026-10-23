@@ -28,6 +28,6 @@
     "vitest": "^5.0.4",
     "workbox-precaching": "^7.4.1",
     "workbox-routing": "^7.4.1",
-    "wrangler": "^4.148.0"
+    "wrangler": "^4.152.0"
   }
 }
