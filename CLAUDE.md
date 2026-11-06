@@ -82,9 +82,12 @@ la hizo). `assignee_id = NULL` significa que la puede hacer cualquiera y aparece
 de todos.
 
 ### Modo viaje desplaza las anclas
-Al activar se guarda `settings.paused_since`. Al desactivar se suman a **todas** las anclas los
-días que duró la pausa, y se borra la clave. Mientras dura, el cron no envía nada.
-Ninguna otra parte del código tiene que saber que existió la pausa.
+Al activar se guarda `settings.paused_since`. Al desactivar se suman los días que duró la pausa
+a las anclas **anteriores a `paused_since`**, y se borra la clave. Las tareas hechas o creadas
+durante el viaje no se desplazan: ya cuentan desde ese día, y desplazarlas las dejaría con el
+ancla en el futuro. Mientras dura, el cron no envía nada y `GET /state` calcula el estado de las
+tareas de antes del viaje como si fuera `paused_since` (`pausedNow()` en `api.ts`), para que no
+se vean envejecer. Fuera de eso, ninguna otra parte del código sabe que existió la pausa.
 
 ### Días en JST con desplazamiento fijo
 Las fechas se guardan en ISO UTC. Los días se cuentan en JST (UTC+9 fijo, Japón no tiene
@@ -135,7 +138,7 @@ como mucho un aviso de cada tipo al día. Si el envío falla, ese día no se rei
 
 ## Estado
 
-Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-10-19.
+Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 2026-11-06.
 
 **Hecho**
 - `schema.sql` v1, ejecutado en D1 remoto.
@@ -180,6 +183,8 @@ Repo: https://github.com/Adrian-CS/Kajikanri (rama `main`). Última sesión: 202
   `styles.css`: `--brand` es el relleno (botones) y `--accent` el color de marca para texto e
   iconos. No meter colores fijos en el CSS ni en `style={}`.
 - `preview_urls = false` en `wrangler.toml`: solo existe la URL de producción.
+- `public/_headers`: cabeceras de seguridad de los estáticos (CSP, nosniff, sin iframes).
+  Un recurso externo nuevo (fuente, CDN…) hay que permitirlo en la CSP o el navegador lo bloquea.
 - Frecuencias rápidas: las cuatro fijas (3 d, 1 sem, 2 sem, 1 mes) más las que añada el
   usuario con «Otra frecuencia». Las propias se guardan para toda la casa en
   `settings.freq_presets` (JSON, máx. 8) vía `PUT /api/presets` y llegan en `/state`.

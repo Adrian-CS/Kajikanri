@@ -46,6 +46,7 @@ const getState: Handler = async ({ env, user }) => {
   ]);
   const now = new Date();
   const rules = trash.results as unknown as TrashRule[];
+  const pausedSince = (paused.results[0] as { value: string } | undefined)?.value ?? null;
   return json({
     now: now.toISOString(),
     me: me.results[0],
@@ -53,11 +54,18 @@ const getState: Handler = async ({ env, user }) => {
     zones: zones.results,
     trashRules: rules,
     trash: { today: trashOn(rules, now, 0), tomorrow: trashOn(rules, now, 1) },
-    pausedSince: (paused.results[0] as { value: string } | undefined)?.value ?? null,
+    pausedSince,
     freqPresets: parsePresets((presets.results[0] as { value: string } | undefined)?.value),
-    tasks: (tasks.results as any[]).map((t) => ({ ...t, ...taskStatus(t, now) })),
+    tasks: (tasks.results as any[]).map((t) => ({ ...t, ...taskStatus(t, pausedNow(t, pausedSince, now)) })),
   });
 };
+
+/**
+ * Durante el modo viaje, las tareas que venían de antes se ven congeladas en el día en que
+ * empezó (al volver se les suma la pausa). Las hechas durante el viaje cuentan con normalidad.
+ */
+const pausedNow = (t: { anchor_at: string }, pausedSince: string | null, now: Date) =>
+  pausedSince && t.anchor_at < pausedSince ? new Date(pausedSince) : now;
 
 // ---------- tareas ----------
 async function validAssignee(env: Env, v: unknown) {
@@ -277,13 +285,14 @@ const setPause: Handler = async ({ req, env }) => {
   }
   if (!cur) return json({ pausedSince: null });
 
-  // Al volver se desplazan todas las anclas los días que duró la pausa:
-  // nada aparece atrasado por haber estado fuera.
+  // Al volver se desplazan las anclas los días que duró la pausa: nada aparece atrasado por
+  // haber estado fuera. Solo las de antes del viaje: una tarea hecha (o creada) durante el
+  // viaje ya cuenta desde ese día, y desplazarla la dejaría con el ancla en el futuro.
   const days = jstDay(new Date()) - jstDay(cur.value);
   await env.DB.batch([
     env.DB.prepare(
-      "UPDATE tasks SET anchor_at = strftime('%Y-%m-%dT%H:%M:%fZ', anchor_at, ?) WHERE archived = 0",
-    ).bind(`+${days} days`),
+      "UPDATE tasks SET anchor_at = strftime('%Y-%m-%dT%H:%M:%fZ', anchor_at, ?) WHERE archived = 0 AND anchor_at < ?",
+    ).bind(`+${days} days`, cur.value),
     env.DB.prepare("DELETE FROM settings WHERE key = 'paused_since'"),
   ]);
   return json({ pausedSince: null, shiftedDays: days });
